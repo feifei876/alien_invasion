@@ -1,16 +1,22 @@
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
+# 虚拟环境
 .venv/
 venv/
 env/
+__pycache__/
 
-# IDE
+# Python 缓存
+*.pyc
+*.pyo
+*.pyd
+
+# IDE 配置
 .idea/
 .vscode/
 *.iml
 
-# Pygame 缓存（如果有）
-*.pyc
+# 游戏文件（可选，看你是否需要备份）
+high_scores.json  # 如果想保留最高分记录，就注释掉这行
+
+# 系统文件
+.DS_Store
+Thumbs.db
