@@ -73,25 +73,21 @@ class AlienInvasion:
             # 射击声
             self.shoot_sound = pygame.mixer.Sound('sounds/shoot.wav')
             self.shoot_sound.set_volume(self.settings.shoot_volume)
-            print("✓ 射击声加载成功")
 
             # 爆炸声
             self.explosion_sound = pygame.mixer.Sound('sounds/explosion.wav')
             self.explosion_sound.set_volume(self.settings.explosion_volume)
-            print("✓ 爆炸声加载成功")
 
             # 背景音乐
             pygame.mixer.music.load('sounds/background.mp3')
             pygame.mixer.music.set_volume(self.settings.background_volume)
-            print("✓ 背景音乐加载成功")
 
-        except FileNotFoundError as e:
-            print(f"⚠️ 警告：找不到音效文件 - {e}")
-            print("游戏将继续运行，但没有声音效果")
+        except FileNotFoundError:
+            # 静默失败，不打印信息
             self.shoot_sound = None
             self.explosion_sound = None
-        except Exception as e:
-            print(f"⚠️ 警告：加载音效时出错 - {e}")
+        except Exception:
+            # 静默失败，不打印信息
             self.shoot_sound = None
             self.explosion_sound = None
 
@@ -337,6 +333,9 @@ class AlienInvasion:
             self._create_fleet()
             self.settings.increase_speed()
 
+            # ✨ 新增：在控制台显示当前速度（调试用）
+            # print(f"等级 {self.stats.level + 1} - 飞船速度: {self.settings.ship_speed:.1f}")
+
             # 提高等级
             self.stats.level += 1
             self.sb.prep_level()
@@ -425,19 +424,34 @@ class AlienInvasion:
         overlay.fill((0, 0, 0))
         self.screen.blit(overlay, (0, 0))
 
-        # ✨ 使用更小的字体
+        # ✨ 使用项目目录中的字体文件（支持ttc格式）
         try:
-            # Windows 系统字体
-            title_font = pygame.font.Font('C:/Windows/Fonts/msyh.ttf', 48)  # 标题 48px
-            heading_font = pygame.font.Font('C:/Windows/Fonts/msyh.ttf', 36)  # 小标题 36px
-            text_font = pygame.font.Font('C:/Windows/Fonts/msyh.ttf', 24)  # 正文 24px
-            small_font = pygame.font.Font('C:/Windows/Fonts/msyh.ttf', 20)  # 提示 20px
-        except:
-            # 如果找不到，使用默认字体
-            title_font = pygame.font.SysFont('simhei', 48)
-            heading_font = pygame.font.SysFont('simhei', 36)
-            text_font = pygame.font.SysFont('simhei', 24)
-            small_font = pygame.font.SysFont('simhei', 20)
+            # 尝试加载本地字体文件
+            font_path = 'fonts/msyh.ttc'  # 使用微软雅黑TTC文件
+
+            # TTC文件包含多个字体，索引0通常是常规体
+            title_font = pygame.font.Font(font_path, 48)
+            heading_font = pygame.font.Font(font_path, 36)
+            text_font = pygame.font.Font(font_path, 24)
+            small_font = pygame.font.Font(font_path, 20)
+
+            # 移除打印信息
+        except Exception:
+            # 如果找不到字体文件，尝试使用系统字体
+            try:
+                # 尝试使用系统字体（作为备选）
+                title_font = pygame.font.SysFont('microsoftyaheui', 48)
+                heading_font = pygame.font.SysFont('microsoftyaheui', 36)
+                text_font = pygame.font.SysFont('microsoftyaheui', 24)
+                small_font = pygame.font.SysFont('microsoftyaheui', 20)
+            except:
+                # 如果还是失败，使用默认字体并显示英文
+                title_font = pygame.font.Font(None, 48)
+                heading_font = pygame.font.Font(None, 36)
+                text_font = pygame.font.Font(None, 24)
+                small_font = pygame.font.Font(None, 20)
+                self._draw_english_help(title_font, heading_font, text_font, small_font)
+                return
 
         # 标题
         title = title_font.render("游戏说明", True, (255, 255, 255))
@@ -446,7 +460,7 @@ class AlienInvasion:
 
         # 当前Y位置
         y_pos = 100
-        line_spacing = 30  # ✨ 行间距
+        line_spacing = 30
 
         # 游戏目标
         goal_title = heading_font.render("游戏目标：", True, (255, 255, 0))
@@ -501,7 +515,7 @@ class AlienInvasion:
             text = small_font.render(item, True, (255, 255, 255))
             text_rect = text.get_rect(left=180, top=y_pos)
             self.screen.blit(text, text_rect)
-            y_pos += 25  # 难度说明用更小的行距
+            y_pos += 25
 
         # 返回提示
         back_text = small_font.render("按 ESC 键返回", True, (200, 200, 200))
